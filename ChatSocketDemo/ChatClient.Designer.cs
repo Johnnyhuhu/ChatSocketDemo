@@ -34,6 +34,7 @@
             this.txtChatMsg = new System.Windows.Forms.RichTextBox();
             this.lbl在线列表 = new System.Windows.Forms.Label();
             this.lbx在线列表 = new System.Windows.Forms.ListBox();
+            this.TcpInfo = new System.Windows.Forms.RichTextBox();
             this.SuspendLayout();
             // 
             // btnClose
@@ -90,11 +91,20 @@
             this.lbx在线列表.Size = new System.Drawing.Size(125, 280);
             this.lbx在线列表.TabIndex = 6;
             // 
+            // TcpInfo
+            // 
+            this.TcpInfo.Location = new System.Drawing.Point(600, 25);
+            this.TcpInfo.Name = "TcpInfo";
+            this.TcpInfo.Size = new System.Drawing.Size(234, 193);
+            this.TcpInfo.TabIndex = 12;
+            this.TcpInfo.Text = "";
+            // 
             // ChatClient
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(590, 319);
+            this.ClientSize = new System.Drawing.Size(846, 319);
+            this.Controls.Add(this.TcpInfo);
             this.Controls.Add(this.btnClose);
             this.Controls.Add(this.btnSend);
             this.Controls.Add(this.txtSendMsg);
@@ -116,5 +126,6 @@
         private System.Windows.Forms.RichTextBox txtChatMsg;
         private System.Windows.Forms.Label lbl在线列表;
         private System.Windows.Forms.ListBox lbx在线列表;
+        private System.Windows.Forms.RichTextBox TcpInfo;
     }
 }

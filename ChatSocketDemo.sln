@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSocketDemo", "ChatSocke
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSocketDemoServer", "ChatSocketDemoServer\ChatSocketDemoServer.csproj", "{B28AB997-6D41-415F-BD7A-60972FE27555}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChatSocketDemoModel", "ChatSocketDemoModel\ChatSocketDemoModel.csproj", "{4F0BC491-47FC-40E8-BC36-03F0C936DC72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{B28AB997-6D41-415F-BD7A-60972FE27555}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B28AB997-6D41-415F-BD7A-60972FE27555}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B28AB997-6D41-415F-BD7A-60972FE27555}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F0BC491-47FC-40E8-BC36-03F0C936DC72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F0BC491-47FC-40E8-BC36-03F0C936DC72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F0BC491-47FC-40E8-BC36-03F0C936DC72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F0BC491-47FC-40E8-BC36-03F0C936DC72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

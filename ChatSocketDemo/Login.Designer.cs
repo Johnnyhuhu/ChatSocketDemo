@@ -52,7 +52,7 @@
             this.txtPort.Name = "txtPort";
             this.txtPort.Size = new System.Drawing.Size(100, 21);
             this.txtPort.TabIndex = 12;
-            this.txtPort.Text = "10000";
+            this.txtPort.Text = "51888";
             // 
             // btnLogin
             // 
