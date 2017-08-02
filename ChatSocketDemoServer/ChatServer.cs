@@ -11,6 +11,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Newtonsoft.Json;
+using ChatSocketDemoModel;
 
 namespace ChatSocketDemoServer
 {
@@ -20,6 +22,8 @@ namespace ChatSocketDemoServer
         private List<Socket> _ClientProxSocketList = new List<Socket>();
         //连接的用户
         private List<User> userList = new List<User>();
+        private List<OnlineUser> onlineUser = new List<OnlineUser>();
+
         private IPAddress localAddress;
         private int port = 51888;
 
@@ -37,7 +41,9 @@ namespace ChatSocketDemoServer
         public ChatServer()
         {
             InitializeComponent();
-            IPAddress[] addrIP = Dns.GetHostAddresses("127.0.0.1"); //ip地址
+            this.setListBoxCallback = new SetListBoxCallBack(SetListBox);
+            this.setComboBoxCallback = new SetComboBoxCallBack(AddComboBoxItem);
+            IPAddress[] addrIP = Dns.GetHostAddresses(this.txtIP.Text); //ip地址
             localAddress = addrIP[0];
         } 
         #endregion
@@ -59,7 +65,7 @@ namespace ChatSocketDemoServer
             //ThreadPool.QueueUserWorkItem(new WaitCallback(this.fnAcceptClientConnect), __serverSocket); 
             #endregion
 
-            myListener = new TcpListener(localAddress, this.port);
+            myListener = new TcpListener(localAddress, int.Parse(this.txtPort.Text));
             myListener.Start();
             this.SetListBox(string.Format("开始在{0}:{1}监听客户连接", this.localAddress, this.port));
             //创建一个线程监听客户端连接请求
@@ -96,7 +102,7 @@ namespace ChatSocketDemoServer
                 User user = new User(newClient);
                 threadReceive.Start(user);
                 userList.Add(user);
-                AddComboBoxitem(user);
+                AddComboBoxItem(user);
                 SetListBox(string.Format("[{0}]进入", newClient.Client.RemoteEndPoint));
                 SetListBox(string.Format("当前连接用户数：{0}", userList.Count));
 
@@ -104,7 +110,7 @@ namespace ChatSocketDemoServer
         }
 
         /// <summary>
-        /// 
+        /// 接收、处理客户端信息，每客户1个线程，参数用于区分是哪个客户
         /// </summary>
         /// <param name="obj"></param>
         public void ReceiveData(object obj)
@@ -144,10 +150,75 @@ namespace ChatSocketDemoServer
                     break;
                 }
                 SetListBox(string.Format("来自[{0}]：{1}", user.client.Client.RemoteEndPoint, receiveString));
+                ClientMsgModel msg = new ClientMsgModel();
+                msg = (ClientMsgModel)JsonConvert.DeserializeObject(receiveString, typeof(ClientMsgModel));
+                                
+                switch (msg.Type)
+                {
+                    case "1":
+                        this.SendLoginMsg(msg, user);
+                        break;
 
+                    case "2":
+                        //OnlineUser olUser = this.onlineUser.Where(delegate(OnlineUser ol)
+                        //{
+                        //    return ol.IP == msg.ReceiveIP && ol.Port == msg.ReceivePort;
+                        //}).FirstOrDefault();
+                        User userReceive = this.userList.Where(delegate(User u)
+                        {
+                            return u.client.Client.RemoteEndPoint.ToString() == msg.ReceiveIP + ":" + msg.ReceivePort;
+                        }).FirstOrDefault();
 
+                        ServerMsgModel __serMsgModel = new ServerMsgModel();
+                        __serMsgModel.SendIP = msg.IP;
+                        __serMsgModel.SendPort = msg.Port;
+                        __serMsgModel.SendUserName = msg.UserName;
+                        __serMsgModel.SendType = msg.Type;
+                        string __sendSerMsg = JsonConvert.SerializeObject(__serMsgModel);
+
+                        SendToClient(userReceive, receiveString);
+                        break;
+                    default: break;
+                }
+            }
+            userList.Remove(user);
+            client.Close();
+            SetListBox(string.Format("当前连接用户数：{0}", userList.Count));
+
+        }
+
+        private void SendTalkMsg()
+        {
+
+        }
+
+        public void SendLoginMsg(ClientMsgModel msg, User user)
+        {
+            //IPAddress ip = IPAddress.Parse(user.client.Client.RemoteEndPoint.ToString());
+
+            OnlineUser __onlineUser = new OnlineUser();
+            __onlineUser.IP = msg.IP;
+            __onlineUser.Port = msg.Port;
+            __onlineUser.UserName = msg.UserName;
+            if (!this.onlineUser.Contains(__onlineUser))
+            {
+                this.onlineUser.Add(__onlineUser);
             }
 
+            SetListBox(string.Format("登录IP:{0}，端口：{1}", msg.IP, msg.Port));
+
+            ServerMsgModel __serMsgModel = new ServerMsgModel();
+            __serMsgModel.SendIP = msg.IP;
+            __serMsgModel.SendPort = msg.Port;
+            __serMsgModel.SendUserName = msg.UserName;
+            __serMsgModel.SendType = msg.Type;
+            __serMsgModel.OnlineUser = this.onlineUser;
+            string __sendSerMsg = JsonConvert.SerializeObject(__serMsgModel);
+
+            for (int i = 0; i < this.userList.Count; i++)
+            {
+                SendToClient(userList[i], __sendSerMsg);
+            }
         }
 
         public void SendToClient(User user, string str)
@@ -165,19 +236,6 @@ namespace ChatSocketDemoServer
             }
         }
 
-
-        private void AddComboBoxitem(User user)
-        {
-            if (this.comboBoxReceiver.InvokeRequired == true)
-            {
-                this.Invoke(this.setComboBoxCallback, user);
-            }
-            else
-            {
-                this.comboBoxReceiver.Items.Add(user.client.Client.RemoteEndPoint);
-            }
-        }
-
         private void SetListBox(string str)
         {
             if (this.listBoxStatus.InvokeRequired)
@@ -190,6 +248,19 @@ namespace ChatSocketDemoServer
             }
         }
 
+        private void AddComboBoxItem(User user)
+        {
+            if (this.comboBoxReceiver.InvokeRequired)
+            {
+                this.Invoke(setComboBoxCallback, user);
+            }
+            else
+            {
+                this.comboBoxReceiver.Items.Add(user.client.Client.RemoteEndPoint);
+            }
+        }
+
+        #region 暂时不用
         /// <summary>
         /// 接收客户端连接  暂不用
         /// </summary>
@@ -264,7 +335,8 @@ namespace ChatSocketDemoServer
 
                 throw;
             }
-        }
+        } 
+        #endregion
         #endregion
 
         #region 窗体事件
