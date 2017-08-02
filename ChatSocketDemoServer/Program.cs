@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ChatSocketDemo
+namespace ChatSocketDemoServer
 {
     static class Program
     {
@@ -16,11 +16,7 @@ namespace ChatSocketDemo
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Login __frmLogin = new Login();
-            if (__frmLogin.ShowDialog() == DialogResult.OK)
-            {
-                Application.Run(new ChatClient(__frmLogin.p_user));
-            }
+            Application.Run(new ChatServer());
         }
     }
 }
