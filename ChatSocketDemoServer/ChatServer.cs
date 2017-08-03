@@ -160,10 +160,6 @@ namespace ChatSocketDemoServer
                         break;
 
                     case "2":
-                        //OnlineUser olUser = this.onlineUser.Where(delegate(OnlineUser ol)
-                        //{
-                        //    return ol.IP == msg.ReceiveIP && ol.Port == msg.ReceivePort;
-                        //}).FirstOrDefault();
                         User userReceive = this.userList.Where(delegate(User u)
                         {
                             return u.client.Client.RemoteEndPoint.ToString() == msg.ReceiveIP + ":" + msg.ReceivePort;
@@ -177,7 +173,7 @@ namespace ChatSocketDemoServer
                         __serMsgModel.SendMsg = msg.Msg;
                         string __sendSerMsg = JsonConvert.SerializeObject(__serMsgModel);
 
-                        SendToClient(userReceive, __sendSerMsg);
+                        SendToClient(userReceive, __sendSerMsg);        
                         break;
                     default: break;
                 }

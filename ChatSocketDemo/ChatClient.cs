@@ -35,6 +35,9 @@ namespace ChatSocketDemo
         private AddListBoxItemCallBack _addList;
         private delegate void AppendChatMsgTextCallBack(string str);
         private AppendChatMsgTextCallBack _appendChatMsgText;
+        private delegate void AppendTcpInfoCallBack(string str);
+        private AppendTcpInfoCallBack _appendTcpInfo;
+
 
         //在线人数
         List<OnlineUser> _onlineUser = new List<OnlineUser>();
@@ -72,7 +75,7 @@ namespace ChatSocketDemo
                 br = new BinaryReader(networkStream);
                 bw = new BinaryWriter(networkStream);
 
-                //发送套接字、当前栏目、编辑的内容、用户名、发送时间。
+                //发送套接字、编辑的内容、用户名、发送时间。
                 ClientMsgModel msg = new ClientMsgModel()
                 {
                     IP = this._user.p_serverIP,
@@ -111,7 +114,8 @@ namespace ChatSocketDemo
                 {
                     //底层套接字不存在时会出现异常
                     //提示数据接收失败
-                    TcpInfo.AppendText("接收数据失败");
+                    //TcpInfo.AppendText("接收数据失败");
+                    this.AppendTcpInfo("接收数据失败");
                 }
                 if (receiveString == null)
                 {
@@ -167,7 +171,10 @@ namespace ChatSocketDemo
         {
             if (this.lbx在线列表.InvokeRequired)
             {
-                this.Invoke(_addList, str);
+                if (this._addList != null)
+                {
+                    this.Invoke(_addList, str);
+                }                
             }
             else
             {
@@ -182,11 +189,29 @@ namespace ChatSocketDemo
         {
             if (this.txtChatMsg.InvokeRequired)
             {
-                this.txtChatMsg.Invoke(this._appendChatMsgText, str);
+                if (this._appendChatMsgText != null)
+                {
+                    this.txtChatMsg.Invoke(this._appendChatMsgText, str);
+                }                
             }
             else
             {
                 this.txtChatMsg.AppendText(str + Environment.NewLine);
+            }
+        }
+
+        public void AppendTcpInfo(string str)
+        {
+            if (this.TcpInfo.InvokeRequired)
+            {
+                if (this._appendTcpInfo != null)
+                {
+                    this.TcpInfo.Invoke(this._appendTcpInfo, str);
+                }                
+            }
+            else
+            {
+                this.TcpInfo.AppendText(str);
             }
         }
 
@@ -202,7 +227,7 @@ namespace ChatSocketDemo
                 { 
                     return olUser.UserName == this.lbx在线列表.SelectedItem.ToString(); 
                 }).FirstOrDefault();
-                //发送套接字、当前栏目、编辑的内容、用户名、发送时间。
+                //发送套接字、编辑的内容、用户名、发送时间。
                 ClientMsgModel msg = new ClientMsgModel()
                 {
                     IP = this._user.p_serverIP,
@@ -230,18 +255,47 @@ namespace ChatSocketDemo
         {
             try
             {
-
+                this.Close();
             }
             catch (Exception ex)
             {
 
                 throw ex;
             }
-        } 
+        }
+
+        private void ChatClient_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            try
+            {
+                if (this.client != null)
+                {
+                    //发送套接字、编辑的内容、用户名、发送时间。
+                    ClientMsgModel msg = new ClientMsgModel()
+                    {
+                        IP = this._user.p_serverIP,
+                        Port = this._user.p_serverPort,
+                        Msg = "SignOut",
+                        NowDate = DateTime.Now.ToString(),
+                        Type = "3",
+                        UserName = this._user.p_userName
+                    };
+                    //string sendMsg = ConvertJson.ToJson(msg);
+                    string sendMsg = JsonConvert.SerializeObject(msg);
+
+                    isExit = true;
+                    br.Close();
+                    bw.Close();
+                    this.client.Close();
+                }
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+        }
         #endregion
-
-
-
 
     }
 }

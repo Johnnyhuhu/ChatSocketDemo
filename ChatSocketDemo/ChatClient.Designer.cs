@@ -113,6 +113,7 @@
             this.Controls.Add(this.lbx在线列表);
             this.Name = "ChatClient";
             this.Text = "客户端";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ChatClient_FormClosing);
             this.ResumeLayout(false);
             this.PerformLayout();
 
