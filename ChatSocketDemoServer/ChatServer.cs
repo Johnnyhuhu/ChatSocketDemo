@@ -170,13 +170,14 @@ namespace ChatSocketDemoServer
                         }).FirstOrDefault();
 
                         ServerMsgModel __serMsgModel = new ServerMsgModel();
-                        __serMsgModel.SendIP = msg.IP;
-                        __serMsgModel.SendPort = msg.Port;
+                        __serMsgModel.SendIP = (user.client.Client.RemoteEndPoint as IPEndPoint).Address.ToString();
+                        __serMsgModel.SendPort = (user.client.Client.RemoteEndPoint as IPEndPoint).Port.ToString();
                         __serMsgModel.SendUserName = msg.UserName;
                         __serMsgModel.SendType = msg.Type;
+                        __serMsgModel.SendMsg = msg.Msg;
                         string __sendSerMsg = JsonConvert.SerializeObject(__serMsgModel);
 
-                        SendToClient(userReceive, receiveString);
+                        SendToClient(userReceive, __sendSerMsg);
                         break;
                     default: break;
                 }
@@ -197,8 +198,8 @@ namespace ChatSocketDemoServer
             //IPAddress ip = IPAddress.Parse(user.client.Client.RemoteEndPoint.ToString());
 
             OnlineUser __onlineUser = new OnlineUser();
-            __onlineUser.IP = msg.IP;
-            __onlineUser.Port = msg.Port;
+            __onlineUser.IP = (user.client.Client.RemoteEndPoint as IPEndPoint).Address.ToString();
+            __onlineUser.Port = (user.client.Client.RemoteEndPoint as IPEndPoint).Port.ToString();
             __onlineUser.UserName = msg.UserName;
             if (!this.onlineUser.Contains(__onlineUser))
             {

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using ChatSocketDemoModel;
+using System.Net;
 
 namespace ChatSocketDemo
 {
@@ -32,6 +33,8 @@ namespace ChatSocketDemo
 
         private delegate void AddListBoxItemCallBack(string str);
         private AddListBoxItemCallBack _addList;
+        private delegate void AppendChatMsgTextCallBack(string str);
+        private AppendChatMsgTextCallBack _appendChatMsgText;
 
         //在线人数
         List<OnlineUser> _onlineUser = new List<OnlineUser>();
@@ -50,7 +53,7 @@ namespace ChatSocketDemo
             //建立网络通信
             try
             {
-                this.client = new TcpClient(this._user.p_userIP, int.Parse(this._user.p_userPort));//定义服务器端ip地址和端口，与服务器端定义要一致
+                this.client = new TcpClient(this._user.p_serverIP, int.Parse(this._user.p_serverPort));//定义服务器端ip地址和端口，与服务器端定义要一致
 
                 this.linkFlag = true;
             }
@@ -60,6 +63,7 @@ namespace ChatSocketDemo
                 return;
             }
             this._addList = new AddListBoxItemCallBack(this.AddListBoxItem);
+            this._appendChatMsgText = new AppendChatMsgTextCallBack(this.AppendChatMsgText);
             if (this.linkFlag)
             {
                 //获取网络流
@@ -71,8 +75,8 @@ namespace ChatSocketDemo
                 //发送套接字、当前栏目、编辑的内容、用户名、发送时间。
                 ClientMsgModel msg = new ClientMsgModel()
                 {
-                    IP = this._user.p_userIP,
-                    Port = this._user.p_userPort,
+                    IP = this._user.p_serverIP,
+                    Port = this._user.p_serverPort,
                     Msg = this.txtSendMsg.Text,
                     NowDate = DateTime.Now.ToString(),
                     Type = "1",
@@ -133,10 +137,10 @@ namespace ChatSocketDemo
                         }
                         break;
                     case "2":
-                        this.txtChatMsg.AppendText(__serverMsg.SendMsg + Environment.NewLine);
+                        this.AppendChatMsgText(__serverMsg.SendMsg);
                         break;
                     default: break;
-                }
+                }  
 
             }
         }
@@ -174,6 +178,18 @@ namespace ChatSocketDemo
             }
         }
 
+        public void AppendChatMsgText(string str)
+        {
+            if (this.txtChatMsg.InvokeRequired)
+            {
+                this.txtChatMsg.Invoke(this._appendChatMsgText, str);
+            }
+            else
+            {
+                this.txtChatMsg.AppendText(str + Environment.NewLine);
+            }
+        }
+
         #endregion
 
         #region 窗体事件
@@ -189,8 +205,8 @@ namespace ChatSocketDemo
                 //发送套接字、当前栏目、编辑的内容、用户名、发送时间。
                 ClientMsgModel msg = new ClientMsgModel()
                 {
-                    IP = this._user.p_userIP,
-                    Port = this._user.p_userPort,
+                    IP = this._user.p_serverIP,
+                    Port = this._user.p_serverPort,
                     Msg = this.txtSendMsg.Text,
                     NowDate = DateTime.Now.ToString(),
                     Type = "2",

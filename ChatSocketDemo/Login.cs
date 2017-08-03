@@ -70,9 +70,9 @@ namespace ChatSocketDemo
             {
                 User __user = new User();
 
-                __user.p_userIP = this.txtIP.Text;
+                __user.p_serverIP = this.txtIP.Text;
                 __user.p_userName = this.txtLoginName.Text;
-                __user.p_userPort = this.txtPort.Text;
+                __user.p_serverPort = this.txtPort.Text;
                 this.p_user = __user;
                 this.DialogResult = DialogResult.OK;
 
