@@ -1,5 +1,6 @@
 # ChatSocketDemo
 一个基于Socket服务器的点对点聊天小程序。
+------------------------------------
 
 服务器端：
 ![Alt 服务器端](https://github.com/Johnnyhuhu/ChatSocketDemo/blob/master/Screenshots/1.png)
